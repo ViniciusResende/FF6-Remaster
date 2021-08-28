@@ -98,7 +98,7 @@ void createHero(HeroInfo *hero) {
 	hero->previousX = 1;
 	hero->previousY = 1;
 
-	hero->speed = 20;
+	hero->speed = 200;
 	hero->attack = 30;
 	hero->health = HERO_HEALTH;
 	hero->maxHealth = HERO_HEALTH;
@@ -433,7 +433,7 @@ void handleDrawBattleLifeBars(BattleInfo currentBattle) {
 
 void explorationOrchestrator (
 	ALLEGRO_BITMAP *BG, 
-	ALLEGRO_BITMAP *brush, 
+	ALLEGRO_BITMAP *obstacle, 
 	ALLEGRO_BITMAP *stageExit, 
 	int brushPositions[], 
 	int heroMovePosition, 
@@ -445,8 +445,8 @@ void explorationOrchestrator (
 	drawBackground(BG);
 	drawStageExit(stageExit);
 	drawExplorationHero(heroMovePosition, heroBitmap, heroData);
-	// draw brush
-	drawMapDetails(brush, brushPositions, 15);
+	// draw obstacle
+	drawMapDetails(obstacle, brushPositions, 15);
 	handleDrawExp(heroData, font); 
 	drawScore(enemiesDefeated, font);
 }
@@ -618,7 +618,13 @@ int main(int argc, char **argv) {
 		battleBackgrounds[i] = al_load_bitmap(str);
 	}
 	
-	ALLEGRO_BITMAP *brush = al_load_bitmap("assets/images/scenario/exploration/obstacles/brush.png");
+	// obstacles
+	ALLEGRO_BITMAP *obstacles[STAGE_QUANTITY];
+	for (i = 0; i < STAGE_QUANTITY; i++) {
+   	sprintf(str, "assets/images/scenario/exploration/obstacles/obstacle%d.png", i);
+		obstacles[i] = al_load_bitmap(str);
+	}
+
 	// stage exits
 	ALLEGRO_BITMAP *stageExits[STAGE_QUANTITY];
 	for (i = 0; i < STAGE_QUANTITY; i++) {
@@ -675,7 +681,7 @@ int main(int argc, char **argv) {
   al_install_keyboard();
  
 	// desenha a tela de exploração como default
-  explorationOrchestrator(explorationBackgrounds[currentStage-1], brush, stageExits[currentStage-1], brushPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);		
+  explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], brushPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);		
  
 	// cria a fila de eventos
 	event_queue = al_create_event_queue();
@@ -851,7 +857,7 @@ int main(int argc, char **argv) {
 			} else {
 				// se modo de exploracao: 
 				// chama a funcao orquestradora que desenha o cenario de exploracao
-				explorationOrchestrator(explorationBackgrounds[currentStage-1], brush, stageExits[currentStage-1], brushPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);
+				explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], brushPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);
 			
 				// para cada um dos inimigos
 				for(i=0; i<ENEMY_NUM; i++) {
@@ -943,7 +949,6 @@ int main(int argc, char **argv) {
 	al_destroy_timer(timer);
 	al_destroy_display(display);
 	al_destroy_event_queue(event_queue);
-	al_destroy_bitmap(brush);
 	al_destroy_bitmap(noctis);
 	al_destroy_bitmap(noctisBig);
 
@@ -953,6 +958,10 @@ int main(int argc, char **argv) {
 
 	for (i = 0; i < STAGE_QUANTITY; i++) {
 		al_destroy_bitmap(battleBackgrounds[i]);
+	}
+
+	for (i = 0; i < STAGE_QUANTITY; i++) {
+		al_destroy_bitmap(obstacles[i]);
 	}
 
 	for (i = 0; i < STAGE_QUANTITY; i++) {
