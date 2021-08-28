@@ -16,7 +16,7 @@
 #define STAGE_QUANTITY 4
 #define HERO_ANIMATIONS_QTD 2
 #define ENEMY_ANIMATIONS_QTD 4
-#define HERO_HEALTH 10050
+#define HERO_HEALTH 200
 
 const float FPS = 60;  
 const int SCREEN_W = 640;
@@ -98,7 +98,7 @@ void createHero(HeroInfo *hero) {
 	hero->previousX = 1;
 	hero->previousY = 1;
 
-	hero->speed = 200;
+	hero->speed = 20;
 	hero->attack = 30;
 	hero->health = HERO_HEALTH;
 	hero->maxHealth = HERO_HEALTH;
@@ -380,7 +380,7 @@ void handleHeroAttackFinish(BattleInfo *currentBattle, EnemyAttackInfo *attack, 
 	if(currentBattle->enemy->health >= 0) {
 		fireEnemyAttack(attack);
 	} else {
-		currentBattle->hero->exp += (currentBattle->enemy->type*75);
+		currentBattle->hero->exp += (currentBattle->enemy->type*85);
 		*enemiesDefeated += 1;
 	}
 }
@@ -648,7 +648,7 @@ int main(int argc, char **argv) {
 
 	//hero normal attack
 	heroAnimations[1].n = 5;
-	for (i = 0; i < 26; i++) {
+	for (i = 0; i < 5; i++) {
    	sprintf(str, "assets/images/hero/normalAttack/noctisAttack%d.png", i);
 		heroAnimations[1].spriteImages[i] = al_load_bitmap(str);
 	}
@@ -830,7 +830,7 @@ int main(int argc, char **argv) {
 		if(NoctisLucisCaelum.exp >= NoctisLucisCaelum.expToNextLevel && !isInBattleMode) {
 			NoctisLucisCaelum.exp -= NoctisLucisCaelum.expToNextLevel;
 			NoctisLucisCaelum.level += 1;
-			NoctisLucisCaelum.expToNextLevel += NoctisLucisCaelum.expToNextLevel*NoctisLucisCaelum.level;
+			NoctisLucisCaelum.expToNextLevel += NoctisLucisCaelum.expToNextLevel*(NoctisLucisCaelum.level/4);
 
 			NoctisLucisCaelum.attack += 5*NoctisLucisCaelum.level;
 			NoctisLucisCaelum.maxHealth += 15*NoctisLucisCaelum.level;
