@@ -661,7 +661,7 @@ int main(int argc, char **argv) {
 	}	
 
 	//Enemy Attack animation
-	for (i = 0; i <= ENEMY_ANIMATIONS_QTD; i++) {
+	for (i = 0; i < ENEMY_ANIMATIONS_QTD; i++) {
 		enemyAnimations[i].n = 5;
 		for (j = 0; j < 5; j++) {
 			sprintf(str, "assets/images/enemy/enemiesAttacks/enemy%dAttack%d.png", i, j);
