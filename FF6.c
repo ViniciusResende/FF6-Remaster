@@ -435,7 +435,7 @@ void explorationOrchestrator (
 	ALLEGRO_BITMAP *BG, 
 	ALLEGRO_BITMAP *obstacle, 
 	ALLEGRO_BITMAP *stageExit, 
-	int brushPositions[], 
+	int obstaclePositions[], 
 	int heroMovePosition, 
 	ALLEGRO_BITMAP *heroBitmap, 
 	HeroInfo heroData,
@@ -444,9 +444,9 @@ void explorationOrchestrator (
 	) {
 	drawBackground(BG);
 	drawStageExit(stageExit);
+	drawMapDetails(obstacle, obstaclePositions, 15);
 	drawExplorationHero(heroMovePosition, heroBitmap, heroData);
 	// draw obstacle
-	drawMapDetails(obstacle, brushPositions, 15);
 	handleDrawExp(heroData, font); 
 	drawScore(enemiesDefeated, font);
 }
@@ -545,15 +545,15 @@ int main(int argc, char **argv) {
 	initEnemyAttack(&enemyAttack);
 
 	// cria uma array contendo as posicoes das moitas no mapa primeiro o a[i] = x a[i+1] = y
-	int brushPositions[30] = {0};
+	int obstaclePositions[30] = {0};
 
 	for(int i = 0; i < 30; i++) {
 		if(i % 2 == 0) {
 			//width
-			brushPositions[i] = rand()%400 - i;
+			obstaclePositions[i] = randIntBetween(0, SCREEN_W-120);
 		} else {
 			//height
-			brushPositions[i] = rand()%300 + i;
+			obstaclePositions[i] = randIntBetween(0, SCREEN_H-30);
 		}
 	}
 
@@ -681,7 +681,7 @@ int main(int argc, char **argv) {
   al_install_keyboard();
  
 	// desenha a tela de exploração como default
-  explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], brushPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);		
+  explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], obstaclePositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);		
  
 	// cria a fila de eventos
 	event_queue = al_create_event_queue();
@@ -857,7 +857,7 @@ int main(int argc, char **argv) {
 			} else {
 				// se modo de exploracao: 
 				// chama a funcao orquestradora que desenha o cenario de exploracao
-				explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], brushPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);
+				explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], obstaclePositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);
 			
 				// para cada um dos inimigos
 				for(i=0; i<ENEMY_NUM; i++) {
