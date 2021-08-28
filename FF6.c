@@ -740,9 +740,10 @@ int main(int argc, char **argv) {
 				break;
 
 				case ALLEGRO_KEY_DOWN:
-					if(NoctisLucisCaelum.y < SCREEN_H - 2*HERO_SIZE)			
+					if(NoctisLucisCaelum.y < SCREEN_H - 2*HERO_SIZE) {
 						NoctisLucisCaelum.y += NoctisLucisCaelum.speed;
 						heroMovePosition = 0;
+					}			
 				break;
 
 				case ALLEGRO_KEY_LEFT:
@@ -753,9 +754,10 @@ int main(int argc, char **argv) {
 				break;
 
 				case ALLEGRO_KEY_RIGHT:
-					if(NoctisLucisCaelum.x < SCREEN_W - HERO_SIZE) 
+					if(NoctisLucisCaelum.x < SCREEN_W - HERO_SIZE) {
 						NoctisLucisCaelum.x += NoctisLucisCaelum.speed;
 						heroMovePosition = 1;
+					}
 				break;
 
 				// encerra o jogo
