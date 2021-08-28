@@ -13,12 +13,12 @@
 </h4>
 
 <p align="center">
-  <a href="#mag_right-about-the-project">Resumo Informal</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#desktop_computer-layout-of-the-applicationdesktop">Game Lore</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#rocket-launching-the-project">Gameplay</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#man_technologist-used-technologies">Código & Arquitetura</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#raising_hand_man-developer">Developer</a> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#trophy-acknowledgment">Acknowledgment</a> 
+  <a href="#resumo-informal">Resumo Informal</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#game-lore">Game Lore</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#gameplay">Gameplay</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#código--arquitetura">Código & Arquitetura</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#developer">Developer</a>
+
 </p>
 
 </br>
@@ -280,3 +280,11 @@ Nesse sentido, irei começar setorizando as funções dispostas no código, de f
 <p align="justify">
 Essencialmente, pensei em ter uma função main com a menor responsabilidade possível, sendo assim a função main é responsável por armazenar
 </p>
+
+## Developer
+
+<a href="https://github.com/ViniciusResende">
+ 	<img src="https://res.cloudinary.com/viniciusalvesdefaria/image/upload/v1613257612/foto_perfil_rounded_mv1cpi.png" width="100px;" alt=""/>
+ <br />
+ 	<b>Vinícius Alves</b></a> <a href="https://github.com/ViniciusResende" title="Vinícius Alves"></a>
+ <br />
