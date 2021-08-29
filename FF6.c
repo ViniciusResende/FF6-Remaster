@@ -330,7 +330,65 @@ void heroRun(BattleInfo *currentBattle, int *isInBattleMode) {
 	currentBattle->hero->y = currentBattle->hero->previousY;
 }
 
+void clearScreen () {
+	//colore toda a tela de preto
+	al_clear_to_color(al_map_rgb(0,0,0));
+}
 
+void drawEndGameMessage(ALLEGRO_FONT *font, int enemiesDefeated) {
+	char my_text[50];
+
+	// imprime a mensagem de finlizacao e a quantidade de pontos
+	sprintf(my_text, "Você finalizou o jogo!");	
+	al_draw_text(font, al_map_rgb(0, 200, 30), SCREEN_W/2 - 150, SCREEN_H/5 - 10, 0, my_text);
+	sprintf(my_text, "Você fez um total de %d pontos.", enemiesDefeated);	
+	al_draw_text(font, al_map_rgb(52, 235, 168), SCREEN_W/2 - 220, SCREEN_H/2 - 10, 0, my_text);
+}
+
+int getMaxScore() {
+	// inicializa variaveis para manipular aquivos
+	FILE *arq;
+	// inicia variavel para armazenar recorde
+	int maxScoreRecorded;
+	// le arquivo e armazena valor na variavel
+	arq = fopen("maxScore.txt", "r");
+	fscanf(arq, "%d", &maxScoreRecorded);
+
+	fclose(arq);
+
+	return maxScoreRecorded;
+}
+
+void drawScoreMessage(ALLEGRO_FONT *font, int enemiesDefeated, int maxScoreRecorded) {
+	char my_text[50];
+
+	// no caso do recorde ser menor que a pontuacao atual, aidicona "antigo " a variavel
+	char previousRecord[10];
+	sprintf(previousRecord, maxScoreRecorded >= enemiesDefeated ? "" : "antigo ");
+
+	// imprime o recorde de pontos
+	sprintf(my_text, "Seu %srecorde eh de %d pontos.", previousRecord, maxScoreRecorded);	
+	al_draw_text(font, al_map_rgb(52, 235, 168), SCREEN_W/2 - 220, SCREEN_H - 150, 0, my_text);
+}
+
+void storeNewRecord(int enemiesDefeated) {
+	FILE *arq_aux;
+	arq_aux = fopen("maxScore.txt", "w");
+	fprintf(arq_aux, "%d", enemiesDefeated);
+	fclose(arq_aux);
+}
+
+void drawCongratulationsMessage(ALLEGRO_FONT *font) {
+	char my_text[50];
+	sprintf(my_text, "Parabens pelo novo recorde!!");	
+	al_draw_text(font, al_map_rgb(52, 235, 168), SCREEN_W/2 - 220, SCREEN_H - 50, 0, my_text);
+}
+
+void drawHeroDiedMessage(ALLEGRO_FONT *font) {
+	char my_text[50];
+	sprintf(my_text, "YOU DIED");	
+	al_draw_text(font, al_map_rgb(255, 80, 40), SCREEN_W/2 - 80, SCREEN_H/2 - 10, 0, my_text);
+}
 //----------------------- event functions -------------------------------//
 
 void fireEnemyAttack (EnemyAttackInfo *attack) {
@@ -426,9 +484,24 @@ void handleDrawBattleLifeBars(BattleInfo currentBattle) {
 	drawEnemyLifeBar(currentBattle);
 }
 
-// void handleFinishRund(int enemiesDefeated) {
-// 	drawEndGameMessage(enemiesDefeated);
-// }
+void handleNewRecord(ALLEGRO_FONT *font, int enemiesDefeated) {
+	if(enemiesDefeated > getMaxScore()) {
+		storeNewRecord(enemiesDefeated);
+		drawCongratulationsMessage(font);
+	}
+}
+
+void handleFinishRun(ALLEGRO_FONT *font, int enemiesDefeated) {
+	clearScreen();
+	drawEndGameMessage(font, enemiesDefeated);
+	drawScoreMessage(font, enemiesDefeated, getMaxScore());
+	handleNewRecord(font, enemiesDefeated);
+}
+
+void handleHeroDied(ALLEGRO_FONT *font) {
+	clearScreen();
+	drawHeroDiedMessage(font);
+}
 //----------------------- orchestrators functions -------------------------------//
 
 void explorationOrchestrator (
@@ -892,55 +965,16 @@ int main(int argc, char **argv) {
   } //fim do while principal
   
 	// carrega o arquivo arial.ttf da fonte Arial e define que sera usado o tamanho 32 (segundo parametro)
-  ALLEGRO_FONT *size_32 = al_load_font("assets/fonts/arial.ttf", 32, 1);	
-	
-	char my_text[50];	
-		
-	//colore toda a tela de preto
-	al_clear_to_color(al_map_rgb(0,0,0));
+  ALLEGRO_FONT *size_32 = al_load_font("assets/fonts/arial.ttf", 32, 1);		
 
 	// no caso do heroi ter terminado o jogo
 	if(hasFinishedRun) {
-		// imprime a mensagem de finlizacao e a quantidade de pontos
-		sprintf(my_text, "Você finalizou o jogo!");	
-		al_draw_text(size_32, al_map_rgb(0, 200, 30), SCREEN_W/2 - 150, SCREEN_H/5 - 10, 0, my_text);
-		sprintf(my_text, "Você fez um total de %d pontos.", enemiesDefeated);	
-		al_draw_text(size_32, al_map_rgb(52, 235, 168), SCREEN_W/2 - 220, SCREEN_H/2 - 10, 0, my_text);
-
-		// inicializa variaveis para manipular aquivos
-		FILE *arq, *arq_aux;
-		// inicia variavel para armazenar recorde
-		int maxScoreRecorded;
-		// le arquivo e armazena valor na variavel
-  	arq = fopen("maxScore.txt", "r");
-		fscanf(arq, "%d", &maxScoreRecorded);
-
-		// no caso do recorde ser menor que a pontuacao atual, aidicona "antigo " a variavel
-		char previousRecord[10];
-		sprintf(previousRecord, maxScoreRecorded >= enemiesDefeated ? "" : "antigo ");
-
-		// imprime o recorde de pontos
-		sprintf(my_text, "Seu %srecorde eh de %d pontos.", previousRecord, maxScoreRecorded);	
-		al_draw_text(size_32, al_map_rgb(52, 235, 168), SCREEN_W/2 - 220, SCREEN_H - 150, 0, my_text);
-
-		// caso o recorde tenha sido batido
-		if(enemiesDefeated > maxScoreRecorded) {
-			// escreve novo recorde no arquivo
-  		arq_aux = fopen("maxScore.txt", "w");
-			fprintf(arq_aux, "%d", enemiesDefeated);
-  		fclose(arq_aux);
-			// exibe mensagem de parabens por atingir novo recorde
-			sprintf(my_text, "Parabens pelo novo recorde!!");	
-			al_draw_text(size_32, al_map_rgb(52, 235, 168), SCREEN_W/2 - 220, SCREEN_H - 50, 0, my_text);
-		}
-
-		fclose(arq);
+		handleFinishRun(size_32, enemiesDefeated);
 	}
 
 	// no caso do heroi ter morrido :(
 	if(hasDied){
-		sprintf(my_text, "YOU DIED");	
-		al_draw_text(size_32, al_map_rgb(255, 80, 40), SCREEN_W/2 - 80, SCREEN_H/2 - 10, 0, my_text);
+		handleHeroDied(size_32);
 	}
 	
 	//reinicializa a tela
