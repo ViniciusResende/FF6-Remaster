@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
@@ -6,12 +8,8 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
-#include <math.h>
 
-#define ENEMY_NUM 20
+#define ENEMIES_QTD 20
 #define ENEMIES_VARIATY 4
 #define STAGE_QUANTITY 4
 #define HERO_ANIMATIONS_QTD 2
@@ -21,24 +19,24 @@
 const float FPS = 60;  
 const int SCREEN_W = 640;
 const int SCREEN_H = 480;
-//variavel global que armazena o tamanho do noctis (quadrado que vai navegar pela tela)
+//variaveis globais que armazena o tamanho do noctis (quadrado que vai navegar pela tela) e dos inimigos
 const int HERO_SIZE = 32;
 const int ENEMY_HITBOX = 40;
 
 //----------------------- utils functions -------------------------------//
 
 //aleatorio entre 0 e n-1
-int randWithRange(int n){
+int randWithRange(int n) {
   return rand()%n;
 }
 
 //aleatorio entre min e max (inclusive numeros negativos)
-int randIntBetween(int min, int max){ //EX: min = 5, max = 10
+int randIntBetween(int min, int max) { //EX: min = 5, max = 10
   return min + randWithRange(max - min + 1);
 }
 
-float distBetweenCoordinates(int x1, int y1, int x2, int y2){
-  return sqrt( pow(x1 - x2,2) + pow(y1 - y2,2) );
+float distBetweenCoordinates(int x1, int y1, int x2, int y2) {
+  return sqrt(pow(x1 - x2,2) + pow(y1 - y2,2));
 }
 
 //----------------------- data structures -------------------------------//
@@ -85,7 +83,7 @@ typedef struct animation{
 
 //----------------------- inicialization functions -------------------------------//
 
-void initEnemyAttack (EnemyAttackInfo *attack) {
+void initEnemyAttack(EnemyAttackInfo *attack) {
 	attack->x = 100;
 	attack->y = 350;
 	attack->active = 0;
@@ -105,7 +103,7 @@ void createHero(HeroInfo *hero) {
 	hero->furyLevel = 0;
 
 	hero->level = 1;
-	hero-> exp = 0;
+	hero->exp = 0;
 	hero->expToNextLevel = 300;
 }
 
@@ -195,7 +193,7 @@ void drawEnemy(ALLEGRO_BITMAP *enemies[], int type) {
 	al_draw_bitmap(enemies[type - 1], x, y, 0);
 }
 
-void drawEnemyAttack (EnemyAttackInfo attack, ALLEGRO_BITMAP *enemiesAttack[]) {
+void drawEnemyAttack(EnemyAttackInfo attack, ALLEGRO_BITMAP *enemiesAttack[]) {
 	if(attack.active) {
 		int initialAttackPosition = 100;
 		int attackDistance = 300;
@@ -214,8 +212,8 @@ void drawEnemyAttack (EnemyAttackInfo attack, ALLEGRO_BITMAP *enemiesAttack[]) {
 	}
 }
 
-void updateAttack (EnemyAttackInfo *attack, BattleInfo *currentBattle) {
-	if(attack->active){
+void updateAttack(EnemyAttackInfo *attack, BattleInfo *currentBattle) {
+	if(attack->active) {
 		attack->x += attack->speed;
 		if(attack->x >= 400) {
 			attack->active = 0;
@@ -225,13 +223,13 @@ void updateAttack (EnemyAttackInfo *attack, BattleInfo *currentBattle) {
 	}
 }
 
-int colisionBetweenHeroMonster(HeroInfo hero, EnemyInfo enemy){
+int colisionBetweenHeroMonster(HeroInfo hero, EnemyInfo enemy) {
 	if(distBetweenCoordinates(hero.x, hero.y, enemy.x, enemy.y) <= ENEMY_HITBOX && enemy.health > 0)
 		return 1;
 	return 0;
 }
 
-int colisionBetweenMonsters(EnemyInfo firstEnemy, EnemyInfo secondEnemy){
+int colisionBetweenMonsters(EnemyInfo firstEnemy, EnemyInfo secondEnemy) {
 	if(distBetweenCoordinates(firstEnemy.x, firstEnemy.y, secondEnemy.x, secondEnemy.y) <= ENEMY_HITBOX + 40)
 		return 1;
 	return 0;
@@ -330,7 +328,7 @@ void heroRun(BattleInfo *currentBattle, int *isInBattleMode) {
 	currentBattle->hero->y = currentBattle->hero->previousY;
 }
 
-void clearScreen () {
+void clearScreen() {
 	//colore toda a tela de preto
 	al_clear_to_color(al_map_rgb(0,0,0));
 }
@@ -346,7 +344,6 @@ void drawEndGameMessage(ALLEGRO_FONT *font, int enemiesDefeated) {
 }
 
 int getMaxScore() {
-	// inicializa variaveis para manipular aquivos
 	FILE *arq;
 	// inicia variavel para armazenar recorde
 	int maxScoreRecorded;
@@ -391,7 +388,7 @@ void drawHeroDiedMessage(ALLEGRO_FONT *font) {
 }
 //----------------------- event functions -------------------------------//
 
-void fireEnemyAttack (EnemyAttackInfo *attack) {
+void fireEnemyAttack(EnemyAttackInfo *attack) {
 	if(!attack->active) {
 		attack->active = 1;
 	}
@@ -506,9 +503,9 @@ void handleHeroDied(ALLEGRO_FONT *font) {
 
 void explorationOrchestrator (
 	ALLEGRO_BITMAP *BG, 
-	ALLEGRO_BITMAP *obstacle, 
+	ALLEGRO_BITMAP *mapDetails, 
 	ALLEGRO_BITMAP *stageExit, 
-	int obstaclePositions[], 
+	int mapDetailsPositions[], 
 	int heroMovePosition, 
 	ALLEGRO_BITMAP *heroBitmap, 
 	HeroInfo heroData,
@@ -517,9 +514,8 @@ void explorationOrchestrator (
 	) {
 	drawBackground(BG);
 	drawStageExit(stageExit);
-	drawMapDetails(obstacle, obstaclePositions, 15);
 	drawExplorationHero(heroMovePosition, heroBitmap, heroData);
-	// draw obstacle
+	drawMapDetails(mapDetails, mapDetailsPositions, 15);
 	handleDrawExp(heroData, font); 
 	drawScore(enemiesDefeated, font);
 }
@@ -604,9 +600,9 @@ int main(int argc, char **argv) {
 	HeroInfo NoctisLucisCaelum;
 	createHero(&NoctisLucisCaelum);
 
-	EnemyInfo enemy[ENEMY_NUM];
+	EnemyInfo enemy[ENEMIES_QTD];
 
-	for(i=0; i<ENEMY_NUM; i++) {
+	for(i=0; i<ENEMIES_QTD; i++) {
 		do {
 			createEnemy(&enemy[i], currentStage);
 		} while (!isPossibleToInsertMonster(enemy[i], enemy, i));
@@ -618,15 +614,15 @@ int main(int argc, char **argv) {
 	initEnemyAttack(&enemyAttack);
 
 	// cria uma array contendo as posicoes das moitas no mapa primeiro o a[i] = x a[i+1] = y
-	int obstaclePositions[30] = {0};
+	int mapDetailsPositions[30] = {0};
 
 	for(int i = 0; i < 30; i++) {
 		if(i % 2 == 0) {
 			//width
-			obstaclePositions[i] = randIntBetween(0, SCREEN_W-120);
+			mapDetailsPositions[i] = randIntBetween(0, SCREEN_W-120);
 		} else {
 			//height
-			obstaclePositions[i] = randIntBetween(0, SCREEN_H-30);
+			mapDetailsPositions[i] = randIntBetween(0, SCREEN_H-30);
 		}
 	}
 
@@ -691,11 +687,11 @@ int main(int argc, char **argv) {
 		battleBackgrounds[i] = al_load_bitmap(str);
 	}
 	
-	// obstacles
-	ALLEGRO_BITMAP *obstacles[STAGE_QUANTITY];
+	// mapDetails
+	ALLEGRO_BITMAP *mapDetails[STAGE_QUANTITY];
 	for (i = 0; i < STAGE_QUANTITY; i++) {
-   	sprintf(str, "assets/images/scenario/exploration/obstacles/obstacle%d.png", i);
-		obstacles[i] = al_load_bitmap(str);
+   	sprintf(str, "assets/images/scenario/exploration/mapDetails/mapDetail%d.png", i);
+		mapDetails[i] = al_load_bitmap(str);
 	}
 
 	// stage exits
@@ -754,7 +750,7 @@ int main(int argc, char **argv) {
   al_install_keyboard();
  
 	// desenha a tela de exploração como default
-  explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], obstaclePositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);		
+  explorationOrchestrator(explorationBackgrounds[currentStage-1], mapDetails[currentStage-1], stageExits[currentStage-1], mapDetailsPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);		
  
 	// cria a fila de eventos
 	event_queue = al_create_event_queue();
@@ -888,7 +884,7 @@ int main(int argc, char **argv) {
 
 			currentStage++;
 
-			for(i=0; i<ENEMY_NUM; i++) {
+			for(i=0; i<ENEMIES_QTD; i++) {
 				do {
 					createEnemy(&enemy[i], currentStage);
 				} while (!isPossibleToInsertMonster(enemy[i], enemy, i));
@@ -932,10 +928,10 @@ int main(int argc, char **argv) {
 			} else {
 				// se modo de exploracao: 
 				// chama a funcao orquestradora que desenha o cenario de exploracao
-				explorationOrchestrator(explorationBackgrounds[currentStage-1], obstacles[currentStage-1], stageExits[currentStage-1], obstaclePositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);
+				explorationOrchestrator(explorationBackgrounds[currentStage-1], mapDetails[currentStage-1], stageExits[currentStage-1], mapDetailsPositions, heroMovePosition, noctis, NoctisLucisCaelum, enemiesDefeated, arial_size_16);
 			
 				// para cada um dos inimigos
-				for(i=0; i<ENEMY_NUM; i++) {
+				for(i=0; i<ENEMIES_QTD; i++) {
 					// se existe colisao entre heroi e algum inimigo
 					if(colisionBetweenHeroMonster(NoctisLucisCaelum, enemy[i])) {
 						isInBattleMode = 1;
@@ -973,7 +969,7 @@ int main(int argc, char **argv) {
 	}
 
 	// no caso do heroi ter morrido :(
-	if(hasDied){
+	if(hasDied) {
 		handleHeroDied(size_32);
 	}
 	
@@ -997,7 +993,7 @@ int main(int argc, char **argv) {
 	}
 
 	for (i = 0; i < STAGE_QUANTITY; i++) {
-		al_destroy_bitmap(obstacles[i]);
+		al_destroy_bitmap(mapDetails[i]);
 	}
 
 	for (i = 0; i < STAGE_QUANTITY; i++) {
