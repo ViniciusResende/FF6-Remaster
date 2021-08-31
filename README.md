@@ -278,7 +278,7 @@ Nesse sentido, irei começar setorizando as funções dispostas no código, de f
   </p>
 
 <p align="justify">
-Essencialmente, pensei em ter uma função main com a menor responsabilidade possível, sendo assim a função main é responsável por armazenar
+  Essencialmente, pensei em ter uma função main com a menor responsabilidade possível. Sendo assim a função main é responsável por armazenar variáveis que serão passadas como parâmetro para várias funções que as manipularão, além disso a main é responsável por instanciar vários artifícios da biblioteca alegro em si, para que tudo que é chamado pelas funções, possa ser utiizado da maneira correta. De forma geral, a main é a função principal que estará por cima de todo processo, fazendo chamadas no tempo correto e interagindo com eventos do próprio allegro.
 </p>
 
 ## Developer
