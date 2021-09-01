@@ -217,6 +217,7 @@ void updateAttack(EnemyAttackInfo *attack, BattleInfo *currentBattle) {
 		attack->x += attack->speed;
 		if(attack->x >= 400) {
 			attack->active = 0;
+			currentBattle->enemyAttackActivated = 0;
 			attack->x = 100;
 			currentBattle->hero->health -= currentBattle->enemy->attack;
 		}
@@ -388,17 +389,18 @@ void drawHeroDiedMessage(ALLEGRO_FONT *font) {
 }
 //----------------------- event functions -------------------------------//
 
-void fireEnemyAttack(EnemyAttackInfo *attack) {
+void fireEnemyAttack(EnemyAttackInfo *attack, BattleInfo *currentBattle) {
 	if(!attack->active) {
 		attack->active = 1;
 	}
+	currentBattle->enemyAttackActivated = 1;
 }
 
 void fireHeroRun(int *isInBattleMode, BattleInfo *currentBattle, EnemyAttackInfo *attack) {
 	if(rand()%2){
 		heroRun(currentBattle, isInBattleMode);
 	} else {
-		fireEnemyAttack(attack);
+		fireEnemyAttack(attack, currentBattle);
 	}
 }
 
@@ -413,7 +415,7 @@ void fireHeroSpecialAttack(BattleInfo *currentBattle, EnemyAttackInfo *attack, i
 		currentBattle->hero->exp += (currentBattle->enemy->type*75);
 		*enemiesDefeated += 1;
 	} else {
-		fireEnemyAttack(attack);
+		fireEnemyAttack(attack, currentBattle);
 	}
 }
 
@@ -433,7 +435,7 @@ void handleHeroAttackFinish(BattleInfo *currentBattle, EnemyAttackInfo *attack, 
 		currentBattle->hero->furyLevel += 1;
 
 	if(currentBattle->enemy->health >= 0) {
-		fireEnemyAttack(attack);
+		fireEnemyAttack(attack, currentBattle);
 	} else {
 		currentBattle->hero->exp += (currentBattle->enemy->type*85);
 		*enemiesDefeated += 1;
@@ -857,7 +859,7 @@ int main(int argc, char **argv) {
 				// escolhe opcao
 				case ALLEGRO_KEY_ENTER:
 					// verifica se as acoes de batalha estao toda em estado inativo
-					if(!currentBattle.specialMoveActivated && !currentBattle.normalAttackActivated){
+					if(!currentBattle.specialMoveActivated && !currentBattle.normalAttackActivated && !currentBattle.enemyAttackActivated){
 						// chama funcao que lida com o disparo de acoes de batalha
 						battleActionsOrchestrator(menuPosition, &isInBattleMode, &currentBattle, &enemyAttack, &enemiesDefeated);
 					}
